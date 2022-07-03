@@ -12,8 +12,8 @@ import (
 )
 
 // Mongo client database connection, as global variable for simplicity
-// validate concurrency handling of the go mongo driver
-// TODO: validate concorrency safety of the mongo driver
+// Later : validate concurrency handling of the go mongo driver
+// Later : validate concurrency safety of the mongo driver
 var client *mongo.Client
 
 // talent represents data about a talent with crew.
@@ -52,7 +52,7 @@ func connectMongoDB() *mongo.Client {
 	return client
 }
 
-// getAlbums responds with the list of all albums as JSON.
+// getTalents responds with the list of all talents as JSON.
 func getTalents(c *gin.Context) {
 	client = connectMongoDB()
 	talentsCollection := client.Database("crew").Collection("talents")
@@ -79,6 +79,7 @@ func getTalents(c *gin.Context) {
 	c.JSON(http.StatusOK, talents)
 }
 
+// postTalent get a json body for a Talent and responds with the InsertedId or an error.
 func postTalent(c *gin.Context) {
 	talentsCollection := client.Database("crew").Collection("talents")
 	var talent talent
