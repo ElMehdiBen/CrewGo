@@ -2,14 +2,19 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// Mongo client database connection, as global variable for simplicity
+// validate concurrency handling of the go mongo driver
+// TODO: validate concorrency safety of the mongo driver
+var client *mongo.Client
 
 // talent represents data about a talent with crew.
 type talent struct {
@@ -28,34 +33,30 @@ type talent struct {
 
 func main() {
 
-	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb+srv://crewdb:Opsss112@cluster0.xicjy.mongodb.net/test?authSource=admin&replicaSet=atlas-uhjhzf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true")
-
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MongoDB!")
-
 	router := gin.Default()
 	router.GET("/talents", getTalents)
 	router.POST("/talent", postTalent)
 
-	router.Run("localhost:1112")
+	router.Run("0.0.0.0:1112")
+}
+
+func connectMongoDB() *mongo.Client {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://crewdb:Opsss112@cluster0.xicjy.mongodb.net/test?authSource=admin&replicaSet=atlas-uhjhzf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = client.Connect(context.TODO())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return client
 }
 
 // getAlbums responds with the list of all albums as JSON.
 func getTalents(c *gin.Context) {
+	client = connectMongoDB()
 	talentsCollection := client.Database("crew").Collection("talents")
-	cur, err := talentsCollection.Find(context.TODO(), nil)
+	cur, err := talentsCollection.Find(context.TODO(), bson.D{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

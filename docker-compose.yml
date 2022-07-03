@@ -1,0 +1,9 @@
+version: '3.3'
+
+services:
+
+  crewgo:
+    build: ./
+    ports:
+      - 1112:1112
+    restart: always

@@ -8,8 +8,6 @@ RUN go mod download
 
 COPY *.go ./
 
-RUN go build -o /docker-gs-ping
+RUN go build ./main.go
 
-EXPOSE 1112
-
-CMD [ "/docker-gs-ping" ]
+CMD [ "./main" ]
