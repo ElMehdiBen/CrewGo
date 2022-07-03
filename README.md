@@ -8,11 +8,12 @@ Testing the script is easy :
 
 We can start by running the following command (same folder as the Dockefile): 
 
-docker build . -t crewgo
-docker run -p 1112:1112 -d crewgo
+    docker build . -t crewgo
+
+    docker run -p 1112:1112 -d crewgo
 
 ## Option 2 : using Docker Compose File
 
 We can run the following command (same folder as the Dockefile): 
 
-docker-compose up -d
+    docker-compose up -d
